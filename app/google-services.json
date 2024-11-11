@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "135580660025",
+    "project_id": "restaurant-pda",
+    "storage_bucket": "restaurant-pda.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:135580660025:android:8455e101222e50272238e8",
+        "android_client_info": {
+          "package_name": "com.example.restaurantpda"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAg2vKoEntFr6TYAfzIZU3A29vKbpFydXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
