@@ -16,11 +16,9 @@ import java.util.List;
 
 public class OrderManager extends AppCompatActivity {
 
-    // [Αλλαγή] Αντικαταστάθηκε το Firebase με SQLite
-    private SQLiteDatabase database;  // Αναφορά στη βάση δεδομένων SQLite
-
+    private SQLiteDatabase database; // Αναφορά στη βάση δεδομένων SQLite
     private RecyclerView recyclerView;
-    private ProductAdapter adapter;
+    private RVAdapter adapter; // Χρήση του RVAdapter για το RecyclerView
     private String tableNumber;
     private List<MenuItem> itemsList;
 
@@ -29,8 +27,8 @@ public class OrderManager extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ordering);
 
-        // [Αλλαγή] Αρχικοποίηση SQLite database
-        SqlFinder dbHelper = new SqlFinder(this); // Custom SQLiteOpenHelper κλάση
+        // Αρχικοποίηση SQLite database
+        SqlFinder dbHelper = new SqlFinder(this);
         database = dbHelper.getWritableDatabase();
 
         itemsList = new ArrayList<>();
@@ -38,7 +36,7 @@ public class OrderManager extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.products);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ProductAdapter(itemsList);
+        adapter = new RVAdapter(itemsList); // Δημιουργία προσαρμοσμένου adapter
         recyclerView.setAdapter(adapter);
 
         TextView tableNumTextView = findViewById(R.id.table_num);
@@ -65,9 +63,9 @@ public class OrderManager extends AppCompatActivity {
         findViewById(R.id.button_drinks).setOnClickListener(v -> fetchItemsByCategory("Drinks"));
     }
 
-    // [Αλλαγή] Λήψη δεδομένων από SQLite βάση δεδομένων
+    // Λήψη δεδομένων από SQLite βάση δεδομένων
     private void fetchItemsByCategory(String category) {
-        itemsList.clear(); // Καθαρίζει τη λίστα πριν προσθέσει νέα δεδομένα
+        List<MenuItem> newItems = new ArrayList<>();
         String query = "SELECT name, quantity FROM items WHERE tableNumber = ? AND category = ?";
         Cursor cursor = database.rawQuery(query, new String[]{tableNumber, category});
 
@@ -75,22 +73,20 @@ public class OrderManager extends AppCompatActivity {
             while (cursor.moveToNext()) {
                 String name = cursor.getString(0);
                 int quantity = cursor.getInt(1);
-                itemsList.add(new MenuItem(name, quantity));
+                newItems.add(new MenuItem(name, quantity));
             }
             cursor.close();
         }
 
-        adapter.notifyDataSetChanged();
+        adapter.updateMenuItems(newItems); // Ενημέρωση του RecyclerView
     }
 
-    // [Αλλαγή] Διαγραφή παραγγελίας από τη βάση δεδομένων
     private void clearOrder() {
         database.delete("items", "tableNumber = ?", new String[]{tableNumber});
         itemsList.clear();
         adapter.notifyDataSetChanged();
     }
 
-    // [Αλλαγή] Επαναφορά προϊόντων στη βάση δεδομένων
     private void resetItems() {
         ContentValues values = new ContentValues();
         values.put("quantity", 0);

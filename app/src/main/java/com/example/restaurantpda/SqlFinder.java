@@ -15,7 +15,9 @@ public class SqlFinder extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+
         // Δημιουργία πίνακα προϊόντων
+
         db.execSQL("CREATE TABLE items (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "tableNumber TEXT, " +
