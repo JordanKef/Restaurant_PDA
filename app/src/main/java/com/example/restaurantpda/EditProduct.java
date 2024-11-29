@@ -1,8 +1,6 @@
 package com.example.restaurantpda;
 
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,9 +8,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.sql.SQLException;
+
 public class EditProduct extends AppCompatActivity {
 
-    private SQLiteDatabase database;
     private String tableNumber;
     private String itemName;
 
@@ -42,17 +41,13 @@ public class EditProduct extends AppCompatActivity {
         quantityEditText.setText(String.valueOf(quantity));
         commentsEditText.setText(comments);
 
-        // Αρχικοποίηση database
-        SqlFinder dbHelper = new SqlFinder(this);
-        database = dbHelper.getWritableDatabase();
-
         // Κουμπί Ακύρωσης
         Button cancelButton = findViewById(R.id.button_back);
         cancelButton.setOnClickListener(v -> finish()); // Επιστροφή χωρίς αλλαγές
 
-        // Κουμπί Προσθήκης
-        Button addButton = findViewById(R.id.button_payment);
-        addButton.setOnClickListener(v -> saveChanges());
+        // Κουμπί Αποθήκευσης
+        Button saveButton = findViewById(R.id.button_payment);
+        saveButton.setOnClickListener(v -> saveChanges());
     }
 
     private void saveChanges() {
@@ -65,13 +60,18 @@ public class EditProduct extends AppCompatActivity {
         }
         String newComments = commentsEditText.getText().toString();
 
-        // Ενημέρωση βάσης δεδομένων
-        ContentValues values = new ContentValues();
-        values.put("quantity", newQuantity);
-        values.put("comment", newComments);
-        database.update("items", values, "tableNumber = ? AND name = ?", new String[]{tableNumber, itemName});
+        try {
+            int rowsUpdated = SqlFinder.updateItem(tableNumber, itemName, newQuantity, newComments);
+            if (rowsUpdated > 0) {
+                Toast.makeText(this, "Οι αλλαγές αποθηκεύτηκαν", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Αποτυχία αποθήκευσης", Toast.LENGTH_SHORT).show();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Σφάλμα βάσης δεδομένων", Toast.LENGTH_SHORT).show();
+        }
 
-        Toast.makeText(this, "Οι αλλαγές αποθηκεύτηκαν", Toast.LENGTH_SHORT).show();
-        finish(); // Επιστροφή στο προηγούμενο Activity
+        finish();
     }
 }

@@ -7,21 +7,36 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RVAdapter extends RecyclerView.Adapter<RVAdapter.MenuViewHolder> {
 
-    private List<MenuItem> menuItems;
-    private String tableNumber; // Αποθήκευση αριθμού τραπεζιού
+    private List<MenuItem> menuItems = new ArrayList<>();
+    private String tableNumber; // Αποθήκευση του αριθμού τραπεζιού
 
-    public RVAdapter(List<MenuItem> menuItems) {
-        this.menuItems = menuItems;
-        this.tableNumber = tableNumber; // Αρχικοποίηση
+    public RVAdapter(String tableNumber) {
+        this.tableNumber = tableNumber;
+        fetchMenuItems();
     }
 
-    public void updateMenuItems(List<MenuItem> newItems) {
-        this.menuItems = newItems;
-        notifyDataSetChanged();
+    // Ανάκτηση των δεδομένων από τη βάση SQL Server
+    private void fetchMenuItems() {
+        try {
+            ResultSet resultSet = SqlFinder.fetchMenuItems();
+            menuItems.clear();
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                int quantity = resultSet.getInt("quantity");
+                String category = resultSet.getString("category");
+                menuItems.add(new MenuItem(name, quantity, category));
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @NonNull
@@ -36,11 +51,11 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.MenuViewHolder> {
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
         MenuItem item = menuItems.get(position);
 
-        // Δέσμευση δεδομένων στο ViewHolder
+        // Ανάθεση των δεδομένων στο ViewHolder
         holder.nameTextView.setText(item.getName());
         holder.quantityTextView.setText(String.valueOf(item.getQuantity()));
 
-        // Άνοιγμα EditProduct Activity κατά το κλικ
+        // Άνοιγμα του EditProduct Activity κατά το κλικ
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), EditProduct.class);
             intent.putExtra("TABLE_NUMBER", tableNumber);
