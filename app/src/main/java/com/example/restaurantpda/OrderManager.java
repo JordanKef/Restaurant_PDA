@@ -79,7 +79,7 @@ public class OrderManager extends AppCompatActivity {
             cursor.close();
         }
 
-        adapter.updateMenuItems(newItems); // Ενημέρωση του RecyclerView
+        adapter.fetchMenuItems(newItems); // Ενημέρωση του RecyclerView
     }
 
     private void clearOrder() {
@@ -97,6 +97,5 @@ public class OrderManager extends AppCompatActivity {
 
     private void submitOrder() {
         Log.d("OrderManager", "Η παραγγελία υποβλήθηκε για το τραπέζι " + tableNumber);
-        // Εδώ μπορείς να προσθέσεις custom λογική υποβολής
     }
 }

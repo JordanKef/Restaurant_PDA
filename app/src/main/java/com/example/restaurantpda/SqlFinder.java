@@ -1,5 +1,7 @@
 package com.example.restaurantpda;
 
+import android.database.sqlite.SQLiteDatabase;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -39,5 +41,8 @@ public class SqlFinder {
         stmt.setString(3, tableNumber);
         stmt.setString(4, itemName);
         return stmt.executeUpdate();
+    }
+
+    public SQLiteDatabase getWritableDatabase() {
     }
 }
